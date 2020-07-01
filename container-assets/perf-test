@@ -1,0 +1,20 @@
+#!/bin/bash
+
+pushd ${APP_ROOT}
+  source ./container_env
+
+  echo "====== bin/rake environment ======"
+  time bin/rake environment
+
+  echo "====== ruby -e '' ======"
+  time ruby -e ''
+
+  echo "====== bundle exec /bin/true ======"
+  time bundle exec /bin/true
+
+  echo "====== bundle exec ruby -e '' -r active_record ======"
+  time bundle exec ruby -e '' -r active_record
+
+  echo "====== bin/rails r 'puts EvmDatabase.ping' ======"
+  time bin/rails r 'puts EvmDatabase.ping'
+popd

@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: env-debug
+objects:
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: env-debug-${ID}
+  spec:
+    template:
+      metadata:
+        name: env-debug-${ID}
+      spec:
+        containers:
+        - name: debug
+          image: docker.io/carbonin/manageiq-debug:latest
+          env:
+          - name: DATABASE_PORT
+            valueFrom:
+              secretKeyRef:
+                key: port
+                name: ${DATABASE_SECRET}
+          - name: DATABASE_HOSTNAME
+            valueFrom:
+              secretKeyRef:
+                key: hostname
+                name: ${DATABASE_SECRET}
+          - name: DATABASE_NAME
+            valueFrom:
+              secretKeyRef:
+                key: dbname
+                name: ${DATABASE_SECRET}
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: ${DATABASE_SECRET}
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: ${DATABASE_SECRET}
+          - name: ENCRYPTION_KEY
+            valueFrom:
+              secretKeyRef:
+                key: encryption-key
+                name: ${APP_SECRET}
+          - name: BUNDLER_GROUPS
+            value: manageiq_default
+        restartPolicy: Never
+parameters:
+- name: ID
+  from: "[a-z0-9]{8}"
+  generate: expression
+- name: DATABASE_SECRET
+  value: postgresql-secrets
+- name: APP_SECRET
+  value: app-secrets
